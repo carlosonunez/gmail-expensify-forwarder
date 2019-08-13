@@ -1,0 +1,17 @@
+version: '3.7'
+services:
+  forwarder:
+    build:
+      context: .
+      args:
+        ENVIRONMENT: ${ENVIRONMENT:-test}
+    environment:
+      APPLICATION_NAME: "Expensify Receipt Forwarder"
+      CREDENTIALS_PATH: /secrets/credentials.json
+      TOKEN_PATH: /secrets/token.yml
+      LAST_AUTHORIZATION_CODE: 4/nQEet0g4-fmOuTe3sECeHIVMepweOgAiW1C_CsFHfuX7jnzeXBUBD14
+      ENVIRONMENT: test
+    volumes:
+      - $PWD:/app
+      - /tmp:/secrets
+    working_dir: /app
