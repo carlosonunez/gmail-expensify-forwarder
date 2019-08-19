@@ -1,3 +1,4 @@
 .forwarderdb
 docker-compose.test.yml
 secrets/
+.env
