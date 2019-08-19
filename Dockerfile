@@ -2,7 +2,8 @@ FROM ruby:alpine
 MAINTAINER Carlos Nunez <dev@carlosnunez.me>
 ARG ENVIRONMENT
 
-RUN apk add --no-cache ruby-dev
+RUN apk add --no-cache ruby-dev  ruby-nokogiri build-base libxml2-dev \
+libxslt-dev postgresql-dev sqlite sqlite-libs sqlite-dev less
 
 COPY Gemfile /
 RUN if [ "$ENVIRONMENT"  == "test" ]; \
@@ -14,5 +15,5 @@ RUN if [ "$ENVIRONMENT"  == "test" ]; \
 
 COPY . /app
 WORKDIR /app
-ENTRYPOINT [ "ruby", "forwarder.rb" ]
+ENTRYPOINT [ "ruby", "-I", "./lib", "bin/forwarder.rb" ]
 
