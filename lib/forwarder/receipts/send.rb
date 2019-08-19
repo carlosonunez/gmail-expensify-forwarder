@@ -1,0 +1,2 @@
+require 'forwarder/gmail/send'
+
