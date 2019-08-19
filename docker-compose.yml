@@ -5,13 +5,7 @@ services:
       context: .
       args:
         ENVIRONMENT: production
-    environment:
-      GMAIL_APPLICATION_NAME: "Expensify Receipt Forwarder"
-      GMAIL_MESSAGES_TIME_OFFSET_SECONDS: 25200
-      CREDENTIALS_PATH: /secrets/credentials.json
-      TOKEN_PATH: /secrets/token.yml
-      ENVIRONMENT: production
-      TZ: CST # This must match the timezone set within Gmail.
+    env_file: .env
     volumes:
       - $PWD:/app
       - /tmp:/secrets
