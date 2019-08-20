@@ -1,0 +1,36 @@
+---
+service:
+  name: gmail-to-expensify-forwarding-service
+
+frameworkVersion: '>=1.0.0'
+
+provider:
+  name: aws
+  runtime: ruby2.6
+  region: ${opt:region, 'us-east-2'}
+  memorySize: 128
+  deploymentBucket:
+    name: me.carlosnunez.bots.${self:provider.region}.deploys
+  deploymentPrefix: serverless
+
+package:
+  include:
+    - lib/**
+    - bin/**
+    - .env
+  exclude:
+    - .git/**
+    - travis.yml # Create one first
+  artifact: forwarder_bot.zip
+
+functions:
+  forward:
+    handler: bin/forwarder.begin
+    description: Begins scanning for and forwarding receipts.
+    timeout: 60
+    events:
+      - schedule:
+          name: Gmail Receipt check
+          description: Checks for receipts
+          rate: rate(1 minute)
+          enabled: true
