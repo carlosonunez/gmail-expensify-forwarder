@@ -18,13 +18,9 @@ package:
     - lib/**
     - bin/**
     - .env
-  exclude:
-    - .git/**
-    - travis.yml # Create one first
-  artifact: forwarder_bot.zip
 
 functions:
-  forward:
+  forwarderBegin:
     handler: bin/forwarder.begin
     description: Begins scanning for and forwarding receipts.
     timeout: 60
