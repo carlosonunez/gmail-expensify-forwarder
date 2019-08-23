@@ -1,0 +1,4 @@
+---
+name: gmail-expensify-forwarder
+runtime: python
+description: Deploys pre-requisites needed to run gmail-expensify-forwarder serverless projects.
