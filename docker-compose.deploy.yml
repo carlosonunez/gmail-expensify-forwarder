@@ -1,0 +1,19 @@
+version: '2.2'
+services:
+  pulumi:
+    image: pulumi/pulumi
+    env_file: .env
+    volumes:
+      - $PWD:/app
+    working_dir: /app
+  serverless:
+    image: softinstigate/serverless
+    env_file: .env
+    volumes:
+      - $PWD/infra:/app
+    working_dir: /app
+    command:
+      - deploy
+  deploy-infra:
+    extends: pulumi
+    command: up

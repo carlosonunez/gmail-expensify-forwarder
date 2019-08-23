@@ -1,0 +1,35 @@
+version: '3.7'
+services:
+  forwarder:
+    build:
+      context: .
+      args:
+        ENVIRONMENT: test
+    environment:
+      DEBUG_MODE: 'true'
+      GMAIL_APPLICATION_NAME: "Expensify Receipt Forwarder"
+      CREDENTIALS_PATH: secrets/credentials.json
+      TOKEN_PATH: secrets/token.yml
+      LAST_AUTH_CODE: 4/pAE0pCtxW9TqRZHe1BKanf6BXeYZnxLDqODl5NUvzelDckP73GKC_pQ
+      FORWARDER_LAST_FINISHED_TIME_SECS: 1566104400
+      ENVIRONMENT: production
+      TZ: CST # This must match the timezone set within Gmail.
+    volumes:
+      - $PWD:/app
+    working_dir: /app
+  serverless:
+    image: softinstigate/serverless
+    env_file: .env
+    environment:
+      SLS_DEBUG: 'false'
+    volumes:
+      - $PWD:/app
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/local/bin/docker:/usr/bin/docker
+    working_dir: /app
+    command:
+      - invoke
+      - local
+      - "--docker"
+      - "-f"
+      - forwarderBegin
