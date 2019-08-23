@@ -1,4 +1,3 @@
-.forwarderdb
-docker-compose.test.yml
-secrets/
-.env
+.env.*
+!.env.example
+.serverless/
