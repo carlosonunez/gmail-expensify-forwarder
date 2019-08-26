@@ -3,3 +3,4 @@
 !.env.example
 secrets/
 .serverless/
+infra/__pycache__
