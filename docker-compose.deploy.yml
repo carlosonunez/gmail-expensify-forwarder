@@ -18,4 +18,11 @@ services:
       - deploy
   deploy-infra:
     extends: pulumi
-    command: up
+    command:
+      - up
+      - "-s"
+      - gmail-expensify-forwarder
+  deploy-functions:
+    extends: serverless
+    command:
+      - deploy
