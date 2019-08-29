@@ -10,7 +10,7 @@ provider:
   region: ${opt:region, 'us-east-2'}
   memorySize: 128
   deploymentBucket:
-    name: me.carlosnunez.bots.${self:provider.region}.deploys
+    name: ${env:SERVERLESS_BUCKET_NAME}
   deploymentPrefix: serverless
 
 package:
