@@ -26,7 +26,7 @@ functions:
     timeout: 60
     events:
       - schedule:
-          name: Gmail Receipt check
+          name: gmail_receipt_check
           description: Checks for receipts
           rate: rate(1 minute)
           enabled: true
