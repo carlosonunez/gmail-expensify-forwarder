@@ -6,7 +6,7 @@ frameworkVersion: '>=1.0.0'
 
 provider:
   name: aws
-  runtime: ruby2.6
+  runtime: ruby2.5
   region: ${opt:region, 'us-east-2'}
   memorySize: 128
   deploymentBucket:
