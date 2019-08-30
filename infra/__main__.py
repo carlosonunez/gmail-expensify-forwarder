@@ -7,7 +7,7 @@ for required_env_var in ['SERVERLESS_BUCKET_NAME']:
 
 minimal_serverless_iam_policy_json = json.loads(
     open('files/serverless_iam_policy.json', 'r').read())
-serverless_bucket = s3.Bucket(os.environ.get('SERVERLESS_BUCKET_NAME'))
+serverless_bucket = s3.Bucket('bucket', bucket=os.environ.get('SERVERLESS_BUCKET_NAME'))
 serverless_iam_group = iam.Group('gmail-expensify-serverless-group')
 serverless_iam_user_policy = iam.GroupPolicy('gmail-expensify-forwarder-serverless-user-policy',
                                              policy=json.dumps(minimal_serverless_iam_policy_json),
