@@ -26,3 +26,7 @@ services:
     extends: serverless
     command:
       - deploy
+  destroy-functions:
+    extends: serverless
+    command:
+      - remove
