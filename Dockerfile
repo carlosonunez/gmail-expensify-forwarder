@@ -15,5 +15,5 @@ RUN if [ "$ENVIRONMENT"  == "test" ]; \
 
 COPY . /app
 WORKDIR /app
-ENTRYPOINT [ "ruby", "-I", "./lib", "bin/forwarder.rb" ]
+ENTRYPOINT [ "ruby", "bin/forwarder.rb" ]
 

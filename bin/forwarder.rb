@@ -1,4 +1,9 @@
 #!/usr/bin/env ruby
+$LOAD_PATH.unshift('./lib')
+if Dir.exist? './vendor'
+  $LOAD_PATH.unshift('./vendor/bundle/gems/**/lib')
+end
+
 require 'base64'
 require 'colorize'
 require 'date'
