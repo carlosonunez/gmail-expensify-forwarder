@@ -18,7 +18,6 @@ package:
     - lib/**
     - bin/**
     - vendor/**
-    - .env
   exclude:
     - scripts/**
     - secrets/**
@@ -30,6 +29,10 @@ functions:
     handler: bin/forwarder.begin
     description: Begins scanning for and forwarding receipts.
     timeout: 60
+    environment:
+      USE_AWS: true
+      APP_AWS_ACCESS_KEY_ID: ${env:APP_AWS_ACCESS_KEY_ID}
+      APP_AWS_SECRET_ACCESS_KEY: ${env:APP_AWS_SECRET_ACCESS_KEY}
     events:
       - schedule:
           name: gmail_receipt_check
