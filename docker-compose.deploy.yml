@@ -16,6 +16,12 @@ services:
     working_dir: /app
     command:
       - deploy
+  awscli:
+    image: anigeo/awscli
+    env_file: .env
+    volumes:
+      - $PWD:/app
+    working_dir: /app
   deploy-infra:
     extends: pulumi
     command:
@@ -43,3 +49,8 @@ services:
     extends: serverless
     command:
       - remove
+  seed-aws-ssm:
+    extends: awscli
+    entrypoint: sh
+    command:
+      - scripts/seed_aws_ssm.sh
