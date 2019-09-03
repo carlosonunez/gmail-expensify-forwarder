@@ -47,6 +47,15 @@ seed_last_run_time() {
     --tier 'Standard'
 }
 
+seed_gmail_application_name() {
+  aws ssm put-parameter --name "${AWS_SSM_NAMESPACE}/gmail_application_name" \
+    --value "$GMAIL_APPLICATION_NAME" \
+    --overwrite \
+    --type "String" \
+    --tier 'Standard'
+}
+
 seed_last_run_time && \
+  seed_gmail_application_name && \
   seed_gmail_credentials && \
   seed_gmail_tokens
