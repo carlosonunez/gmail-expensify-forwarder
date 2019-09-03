@@ -1,4 +1,4 @@
-version: '3.7'
+version: '2.2'
 services:
   forwarder:
     build:
@@ -10,3 +10,11 @@ services:
       - $PWD:/app
       - /tmp:/secrets
     working_dir: /app
+  vendor:
+    extends: forwarder
+    entrypoint: sh
+    volumes:
+      - "$PWD/vendor:/vendor"
+    command:
+      - "-c"
+      - "cp -R /usr/local/bundle /vendor"

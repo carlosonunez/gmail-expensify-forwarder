@@ -20,12 +20,25 @@ services:
     extends: pulumi
     command:
       - up
+      - --skip-preview
+      - "-s"
+      - gmail-expensify-forwarder
+  deploy-infra-with-verification:
+    extends: pulumi
+    command:
+      - up
       - "-s"
       - gmail-expensify-forwarder
   deploy-functions:
     extends: serverless
     command:
       - deploy
+  monitor-functions:
+    extends: serverless
+    command:
+      - logs
+      - "-f"
+      - forwarderBegin
   destroy-functions:
     extends: serverless
     command:
