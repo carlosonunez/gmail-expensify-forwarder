@@ -29,7 +29,6 @@ module Forwarder
         value: time_to_put,
         overwrite: true,
         type: 'String',
-        tier: 'Standard'
       })
     end
 
