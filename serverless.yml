@@ -17,7 +17,13 @@ package:
   include:
     - lib/**
     - bin/**
+    - vendor/**
     - .env
+  exclude:
+    - scripts/**
+    - secrets/**
+    - infra/**
+    - docker-compose.*
 
 functions:
   forwarderBegin:
