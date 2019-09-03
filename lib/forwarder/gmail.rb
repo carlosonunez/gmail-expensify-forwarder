@@ -4,8 +4,6 @@ module Forwarder
     class GmailService
       attr_reader :service
 
-      @service = Gmail::Auth.sign_in! if @service.nil?
-
       def self.ensure_initialized?
         raise "Gmail service not ready" if @service.nil?
       end

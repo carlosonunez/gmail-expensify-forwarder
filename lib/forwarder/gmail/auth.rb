@@ -7,7 +7,9 @@ module Forwarder
     module Auth
       @gmail_environment = {
         :credentials_path => ENV['CREDENTIALS_PATH'],
+        :credentials => ENV['CREDENTIALS'],
         :token_path => ENV['TOKEN_PATH'] || '/tmp/tokens.yml',
+        :tokens => ENV['TOKENS'],
         :reauthorize => ENV['REAUTHORIZE'].to_s.downcase == 'true',
         :last_auth_code => ENV['LAST_AUTH_CODE'],
         :auth_scopes => ['SCOPE','GMAIL_READONLY','GMAIL_SEND'].map {|scope_name|
@@ -24,7 +26,8 @@ module Forwarder
             if @gmail_environment[required_env_var].nil?
         end
         raise "Creds file not found at #{@gmail_environment[:credentials_path]}" \
-          if !File.exist? @gmail_environment[:credentials_path]
+          if !File.exist? @gmail_environment[:credentials_path] \
+            or !@gmail_environment[:credentials].nil?
       end
 
       def self.clear_token_data_if_reauthorizing!
@@ -59,8 +62,16 @@ module Forwarder
       def self.authorize!
         clear_token_data_if_reauthorizing!
         client_id = Google::Auth::ClientId.from_file @gmail_environment[:credentials_path]
+        if !@gmail_environment[:tokens].nil?
+          token_path_to_use = '/tmp/tokens.yml'
+          File.open(token_path_to_use, 'w') { |file|
+            file.write(@gmail_environment[:tokens])
+          }
+        else
+          token_path_to_use = @gmail_environment[:token_path]
+        end
         token_store = Google::Auth::Stores::FileTokenStore.new(
-          file: @gmail_environment[:token_path]
+          file: token_path_to_use
         )
         authorizer = Google::Auth::UserAuthorizer.new client_id,
           @gmail_environment[:auth_scopes],
