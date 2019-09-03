@@ -2,8 +2,20 @@ require 'aws-sdk-ssm'
 
 module Forwarder
   class AWS
+    def self.aws_enabled?
+      !ENV['USE_AWS'].nil? and ENV['USE_AWS'].downcase == 'true'
+    end
+
+    if aws_enabled?
+      @@ssm_client = Aws::SSM::Client.new({
+        region: ENV['AWS_REGION'],
+        access_key_id: ENV['APP_AWS_ACCESS_KEY_ID'],
+        secret_access_key: ENV['APP_AWS_SECRET_ACCESS_KEY']
+      })
+    end
+
     def self.verify_environment
-      [ 'AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY', 'AWS_REGION' ].each do |required_env_var|
+      [ 'APP_AWS_ACCESS_KEY_ID', 'APP_AWS_SECRET_ACCESS_KEY', 'AWS_REGION' ].each do |required_env_var|
         raise "AWS environment variable missing: #{required_env_var}" if ENV[required_env_var].nil?
       end
     end

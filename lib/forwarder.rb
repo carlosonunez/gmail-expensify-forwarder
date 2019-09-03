@@ -9,7 +9,7 @@ DEBUG_MODE = ENV['DEBUG_MODE']
 
 module Forwarder
   def self.begin!
-    if !ENV['USE_AWS'].nil? and ENV['USE_AWS'].downcase == 'true'
+    if Forwarder::AWS::aws_enabled?
       Console.show_info_message 'AWS mode enabled!'
       Forwarder::AWS.load_environment_from_aws_ssm!
     end
@@ -27,7 +27,8 @@ module Forwarder
     end
 
     time_finished_secs = Time.now.strftime('%s')
-    if !ENV['USE_AWS'].nil? and ENV['USE_AWS'].downcase == 'true'
+
+    if Forwarder::AWS::aws_enabled?
       Forwarder::AWS.set_last_run_time_in_aws_ssm! time_finished_secs
     else
       Console.show_info_message "We've processed all of the messages " + \
