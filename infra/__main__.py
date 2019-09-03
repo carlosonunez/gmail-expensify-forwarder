@@ -1,6 +1,8 @@
 import pulumi, os, json
 from pulumi_aws import s3, iam
 
+# TODO: Create SSM user, group and policy docs here.
+
 for required_env_var in ['SERVERLESS_BUCKET_NAME']:
     if os.environ.get(required_env_var) == None:
         raise "Please define " + required_env_var
