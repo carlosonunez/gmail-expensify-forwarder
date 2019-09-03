@@ -4,3 +4,4 @@
 secrets/
 .serverless/
 infra/__pycache__
+vendor/
