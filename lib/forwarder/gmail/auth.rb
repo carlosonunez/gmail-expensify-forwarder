@@ -1,15 +1,16 @@
 require 'google/apis/gmail_v1'
 require 'googleauth'
 require 'googleauth/stores/file_token_store'
+require 'forwarder/aws'
 
 module Forwarder
   module Gmail
     module Auth
       @gmail_environment = {
-        :credentials_path => ENV['CREDENTIALS_PATH'],
-        :credentials => ENV['CREDENTIALS'],
+        :credentials_path => ENV['CREDENTIALS_PATH'] || '/tmp/credentials.json',
+        :credentials => ENV['CREDENTIALS'] || Forwarder::AWS::get_parameter_from_ssm('CREDENTIALS'),
         :token_path => ENV['TOKEN_PATH'] || '/tmp/tokens.yml',
-        :tokens => ENV['TOKENS'],
+        :tokens => ENV['TOKENS'] || Forwarder::AWS::get_parameter_from_ssm('TOKENS'),
         :reauthorize => ENV['REAUTHORIZE'].to_s.downcase == 'true',
         :last_auth_code => ENV['LAST_AUTH_CODE'],
         :auth_scopes => ['SCOPE','GMAIL_READONLY','GMAIL_SEND'].map {|scope_name|
@@ -17,7 +18,8 @@ module Forwarder
         },
         :user_id => ENV['GMAIL_USER_ID'] || 'default',
         :oauth_oob_url => ENV['GMAIL_OAUTH_OOB_URI'] || 'urn:ietf:wg:oauth:2.0:oob'.freeze,
-        :app_name => ENV['GMAIL_APPLICATION_NAME']
+        :app_name => ENV['GMAIL_APPLICATION_NAME'] || \
+          Forwarder::AWS::get_parameter_from_ssm('GMAIL_APPLICATION_NAME')
       }
 
       def self.validate_environment!
@@ -25,9 +27,6 @@ module Forwarder
           raise "Please define #{required_env_var.to_s.upcase}" \
             if @gmail_environment[required_env_var].nil?
         end
-        raise "Creds file not found at #{@gmail_environment[:credentials_path]}" \
-          if !File.exist? @gmail_environment[:credentials_path] \
-            or !@gmail_environment[:credentials].nil?
       end
 
       def self.clear_token_data_if_reauthorizing!
@@ -61,7 +60,17 @@ module Forwarder
 
       def self.authorize!
         clear_token_data_if_reauthorizing!
-        client_id = Google::Auth::ClientId.from_file @gmail_environment[:credentials_path]
+        if !@gmail_environment[:credentials].nil?
+          credentials_path_to_use = '/tmp/credentials.json'
+          File.open(credentials_path_to_use, 'w') { |file|
+            file.write(@gmail_environment[:credentials])
+          }
+        else
+          raise "Creds file not found at #{@gmail_environment[:credentials_path]}" \
+            if !File.exist? @gmail_environment[:credentials_path]
+          credentials_path_to_use = @gmail_environment[:credentials_path]
+        end
+        client_id = Google::Auth::ClientId.from_file credentials_path_to_use
         if !@gmail_environment[:tokens].nil?
           token_path_to_use = '/tmp/tokens.yml'
           File.open(token_path_to_use, 'w') { |file|

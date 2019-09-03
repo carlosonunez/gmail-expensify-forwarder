@@ -13,8 +13,8 @@ module Forwarder
 
         begin
           @service = Gmail::Auth.sign_in!
-        rescue Exception
-          raise "Unable to sign into Gmail; see errors above for more information."
+        rescue Exception => e
+          raise "Unable to sign into Gmail; latest error: #{e}"
         end
       end
     end

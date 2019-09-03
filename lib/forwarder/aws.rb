@@ -33,29 +33,28 @@ module Forwarder
       })
     end
 
-    def self.load_environment_from_aws_ssm!
+    def self.get_parameter_from_ssm(parameter)
       verify_environment
+      if !aws_enabled?
+        Console.show_warning_message "AWS is disabled; can't fetch #{parameter}"
+        return nil
+      end
       Console.show_debug_message "🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨"
       Console.show_debug_message "#{__method__.to_s} leaks sensitive info when " + \
         "DEBUG_MODE=true. Turn DEBUG_MODE off in Production to prevent yourself " + \
         "from getting pwn3d."
       Console.show_debug_message "🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨"
-      [
-        'GMAIL_APPLICATION_NAME',
-        'FORWARDER_LAST_FINISHED_TIME_SECS',
-        'CREDENTIALS',
-        'TOKENS'
-      ].each do |parameter|
-        begin
-          path_to_parameter = "/gmail-expensify-forwarder/#{parameter.downcase}"
-          value = @@ssm_client.get_parameter({name: path_to_parameter}).parameter.value
-          Console.show_debug_message "SSM Parameter: #{path_to_parameter} => #{value}"
-          ENV[parameter] = value
-        rescue Aws::SSM::Errors::ParameterNotFound
-            raise "Couldn't load required parameter from SSM: '#{parameter.downcase}'"
-        rescue Exception => e
-          raise "An error occurred while trying to fetch '#{parameter.downcase}' from SSM: #{e}"
-        end
+      begin
+        path_to_parameter = "/gmail-expensify-forwarder/#{parameter.downcase}"
+        value = @@ssm_client.get_parameter({name: path_to_parameter}).parameter.value
+        Console.show_debug_message "SSM Parameter: #{path_to_parameter} => #{value}"
+        value
+      rescue Aws::SSM::Errors::ParameterNotFound
+        Console.show_error_message "Couldn't find parameter from SSM: '#{parameter.downcase}'"
+        return nil
+      rescue Exception => e
+        Console.show_error_message "An error occurred while trying to fetch '#{parameter.downcase}' from SSM: #{e}"
+        return nil
       end
     end
   end

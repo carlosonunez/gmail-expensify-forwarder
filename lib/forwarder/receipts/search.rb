@@ -1,6 +1,7 @@
 require 'forwarder/receipts/receipt_email'
 require 'forwarder/gmail/search'
 require 'forwarder/console'
+require 'forwarder/aws'
 
 module Forwarder
   module Receipts
@@ -22,10 +23,11 @@ module Forwarder
       # this script last ran. Returns a list of raw messages (with 'To:'
       # headers modified) and their IDs.
       def self.find_receipts_within_gmail_since_last_run
-        raise "Please set the time Forwarder finished last" \
-          if ENV['FORWARDER_LAST_FINISHED_TIME_SECS'].nil?
+        last_run_time_secs = ENV['FORWARDER_LAST_FINISHED_TIME_SECS'] || \
+          Forwarder::AWS.get_parameter_from_ssm('FORWARDER_LAST_FINISHED_TIME_SECS')
+        raise "Please set the time Forwarder finished last" if last_run_time_secs.nil?
         gmail_query = "label: Receipts " + \
-                      "after: #{ENV['FORWARDER_LAST_FINISHED_TIME_SECS'].to_i} " + \
+                      "after: #{last_run_time_secs.to_i} " + \
                       "before: #{Time.now.strftime('%s')}"
         full_messages = []
         Gmail::Search.find_emails_matching_query(gmail_query).each do |message|

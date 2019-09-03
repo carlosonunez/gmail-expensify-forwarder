@@ -9,11 +9,6 @@ DEBUG_MODE = ENV['DEBUG_MODE']
 
 module Forwarder
   def self.begin!
-    if Forwarder::AWS::aws_enabled?
-      Console.show_info_message 'AWS mode enabled!'
-      Forwarder::AWS.load_environment_from_aws_ssm!
-    end
-
     emails_found = Forwarder::Receipts::Search.find_receipts_within_gmail_since_last_run
     raise 'No receipts found.' if emails_found.nil?
 
