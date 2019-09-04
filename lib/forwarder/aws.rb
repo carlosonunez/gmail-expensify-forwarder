@@ -24,7 +24,7 @@ module Forwarder
       verify_environment
       Console.show_debug_message "Setting the last run time to: #{time_to_put}"
       @@ssm_client.put_parameter({
-        name: 'forwarder_last_finished_time_secs',
+        name: '/gmail-expensify-forwarder/forwarder_last_finished_time_secs',
         description: 'The last time the Gmail to Expensify forwarder ran.',
         value: time_to_put,
         overwrite: true,
