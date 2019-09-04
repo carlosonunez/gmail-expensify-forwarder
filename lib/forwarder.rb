@@ -4,11 +4,11 @@ require 'forwarder/aws'
 
 module Forwarder
   def self.begin!
-    raise "Please define the address to send from." if ENV['EMAIL_SENDER'].nil?
+    email_sender = ENV['EMAIL_SENDER'] || Forwarder::AWS::get_parameter_from_ssm('email_sender')
+    raise "Please define the address to send from." if email_sender.nil?
     expensify_address = ENV['EXPENSIFY_ADDRESS'] || \
       Forwarder::AWS::get_parameter_from_ssm('expensify_address') || \
       'receipts@expensify.com'
-    email_sender = ENV['EMAIL_SENDER'] || Forwarder::AWS::get_parameter_from_ssm('email_sender')
     emails_found = Forwarder::Receipts::Search.find_receipts_within_gmail_since_last_run(
       gmail_sender: email_sender,
       gmail_recipient: expensify_address
