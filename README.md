@@ -16,4 +16,33 @@ Forwards emails from Gmail to Expensify.
 
 # How to run
 
-`docker-compose run --rm forwarder`.
+## Before You Start
+
+1. Ensure that you've created a "credentials.json" file as directed by the
+[Gmail Quickstart Guide for Ruby](https://developers.google.com/gmail/api/quickstart/ruby).
+
+  Put it somewhere outside of this repository!
+
+2. Copy the example `.env` file: `cp .env.example .env`
+3. Change all of the "change me" values that you need to change.
+
+## Locally
+
+Use `docker-compose run --rm forwarder` to run the Forwarder.
+
+## AWS
+
+You can run the Forwarder within AWS Lambda.
+
+1. Run the Forwarder locally _at least once_ to generate `credentials.json` and
+   `token.yml` files.
+
+2. Run `scripts/seed_aws_ssm.sh` to populate AWS SSM with the content from the files
+   above.
+
+3. Run `scripts/deploy.sh` to deploy underlying infrastructure. Ensure that the
+   `PULUMI_ACCESS_TOKEN` and AWS access and secret keys are set per the `.env` file
+
+4. Run `scripts/monitor.sh` to check that your instance of Forwarder is running.
+
+5. Run `scripts/destroy.sh` to stop and remove all instances of Forwarder from Lambda.
