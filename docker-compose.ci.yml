@@ -1,0 +1,21 @@
+version: '2.2'
+services:
+  travis:
+    image: caktux/travis-cli
+    env_file: .env
+    volumes:
+      - $PWD:/app
+      - $HOME/.travis:/root/.travis
+    working_dir: /app
+  travis-login:
+    extends: travis
+    command:
+      - login
+      - "--github-token"
+      - "$TRAVIS_GITHUB_TOKEN"
+  travis-encrypt-env:
+    extends: travis
+    command:
+      - encrypt-file
+      - ./.env
+      - "--add"
