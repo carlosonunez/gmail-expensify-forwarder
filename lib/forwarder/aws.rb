@@ -21,15 +21,19 @@ module Forwarder
     end
       
     def self.set_last_run_time_in_aws_ssm!(time_to_put)
-      verify_environment
-      Console.show_debug_message "Setting the last run time to: #{time_to_put}"
-      @@ssm_client.put_parameter({
-        name: '/gmail-expensify-forwarder/forwarder_last_finished_time_secs',
-        description: 'The last time the Gmail to Expensify forwarder ran.',
-        value: time_to_put,
-        overwrite: true,
-        type: 'String',
-      })
+      if !ENV['FORWARDER_LAST_FINISHED_TIME_SECS'].nil?
+        Console.show_warning_message "Last time to use set in environment; skipping."
+      else
+        verify_environment
+        Console.show_debug_message "Setting the last run time to: #{time_to_put}"
+        @@ssm_client.put_parameter({
+          name: '/gmail-expensify-forwarder/forwarder_last_finished_time_secs',
+          description: 'The last time the Gmail to Expensify forwarder ran.',
+          value: time_to_put,
+          overwrite: true,
+          type: 'String',
+        })
+      end
     end
 
     def self.get_parameter_from_ssm(parameter)
@@ -44,12 +48,16 @@ module Forwarder
         "from getting pwn3d."
       Console.show_debug_message "🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨"
       begin
+        if !ENV[parameter.upcase].nil?
+          Console.show_warning_message "#{parameter} was found in local environment; skipping."
+          return ENV[parameter.upcase]
+        end
         path_to_parameter = "/gmail-expensify-forwarder/#{parameter.downcase}"
         value = @@ssm_client.get_parameter({name: path_to_parameter}).parameter.value
         Console.show_debug_message "SSM Parameter: #{path_to_parameter} => #{value}"
         value
       rescue Aws::SSM::Errors::ParameterNotFound
-        Console.show_error_message "Couldn't find parameter from SSM: '#{parameter.downcase}'"
+        Console.show_warning_message "Couldn't find parameter from SSM: '#{parameter.downcase}'"
         return nil
       rescue Exception => e
         Console.show_error_message "An error occurred while trying to fetch '#{parameter.downcase}' from SSM: #{e}"

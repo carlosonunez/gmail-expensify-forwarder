@@ -55,7 +55,16 @@ seed_gmail_application_name() {
     --tier 'Standard'
 }
 
+seed_email_sender() {
+  aws ssm put-parameter --name "${AWS_SSM_NAMESPACE}/email_sender" \
+    --value "$EMAIL_SENDER" \
+    --overwrite \
+    --type "String" \
+    --tier 'Standard'
+}
+
 seed_last_run_time && \
+  seed_email_sender && \
   seed_gmail_application_name && \
   seed_gmail_credentials && \
   seed_gmail_tokens
