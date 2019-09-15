@@ -20,6 +20,8 @@ module Forwarder
             "To: #{recipient}\r"
           elsif /^From: / =~ line
             "From: #{sender}\r"
+          elsif /^Content-Transfer-Encoding: quoted-printable/ =~ line
+            ""
           else
             line
           end
