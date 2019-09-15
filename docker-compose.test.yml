@@ -1,5 +1,20 @@
 version: '3.7'
 services:
+  units:
+    build:
+      context: .
+      args:
+        ENVIRONMENT: test
+    entrypoint: rspec
+    volumes:
+      - $PWD:/app
+    environment:
+      LOAD_PATH: "/app/spec;/app/lib"
+    working_dir: /app
+    command:
+      - "--fail-fast"
+      - "--pattern"
+      - "spec/**/*_spec.rb"
   forwarder:
     build:
       context: .
