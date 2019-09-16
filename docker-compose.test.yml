@@ -5,6 +5,7 @@ services:
       context: .
       args:
         ENVIRONMENT: test
+    env_file: .env.test
     entrypoint: rspec
     volumes:
       - $PWD:/app
