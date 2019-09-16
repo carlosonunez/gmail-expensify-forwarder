@@ -17,15 +17,15 @@ module Forwarder
         Console.show_debug_message "Modifying 'To' and 'From' headers for #{gmail_message.id}"
         reconstructed_message = gmail_message.raw.split("\n").map { |line|
           if /^To: / =~ line
-            "To: #{recipient}\r"
+            "To: #{recipient}"
           elsif /^From: / =~ line
-            "From: #{sender}\r"
+            "From: #{sender}"
           elsif /^Content-Transfer-Encoding: quoted-printable/ =~ line
             ""
           else
             line
           end
-        }.join
+        }.join("\n")
         ReceiptEmail.new(gmail_message.id, reconstructed_message)
       end
 
