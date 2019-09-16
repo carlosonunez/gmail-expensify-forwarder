@@ -1,3 +1,5 @@
+require 'colorize'
+
 module Forwarder
   class Console
     def self.use_timestamps?
