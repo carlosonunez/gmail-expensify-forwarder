@@ -1,5 +1,27 @@
 version: '2.2'
 services:
+  gpg:
+    image: vladgh/gpg
+    volumes:
+      - $PWD:/app
+    working_dir: /app
+  encrypt-env:
+    extends: gpg
+    command:
+      - '--batch'
+      - '--yes'
+      - "--passphrase $ENV_PASSWORD"
+      - "--output env.enc"
+      - "--symmetric"
+      - .env
+  decrypt-env:
+    extends: gpg
+    command:
+      - '--decrypt'
+      - '--batch'
+      - "--passphrase $ENV_PASSWORD"
+      - '--out .env'
+      - .env.enc
   pulumi:
     build:
       context: infra/

@@ -17,6 +17,6 @@ describe 'Weird email edge cases' do
         ENV['EMAIL_SENDER'])
 
     expected_email = read_test_file('expected_quoted_printable_email.html')
-    expect(receipt_email.raw == expected_email).to be true
+    expect(receipt_email.raw).to eq expected_email
   end
 end

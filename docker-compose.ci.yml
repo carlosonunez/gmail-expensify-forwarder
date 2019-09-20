@@ -1,21 +1,24 @@
 version: '2.2'
 services:
-  travis:
-    image: caktux/travis-cli
-    env_file: .env
+  gpg:
+    image: vladgh/gpg
     volumes:
       - $PWD:/app
-      - $HOME/.travis:/root/.travis
     working_dir: /app
-  travis-login:
-    extends: travis
+  encrypt-env:
+    extends: gpg
     command:
-      - login
-      - "--github-token"
-      - "$TRAVIS_GITHUB_TOKEN"
-  travis-encrypt-env:
-    extends: travis
+      - --batch
+      - --yes
+      - --passphrase=$ENV_PASSWORD
+      - --output=env.gpg
+      - --symmetric
+      - .env
+  decrypt-env:
+    extends: gpg
     command:
-      - encrypt-file
-      - ./.env
-      - "--add"
+      - '--decrypt'
+      - '--batch'
+      - "--passphrase $ENV_PASSWORD"
+      - '--out .env'
+      - .env.gpg
