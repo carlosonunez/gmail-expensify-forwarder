@@ -2,6 +2,7 @@ require 'forwarder/receipts/receipt_email'
 require 'forwarder/gmail/search'
 require 'forwarder/console'
 require 'forwarder/aws'
+require 'mail'
 
 module Forwarder
   module Receipts
@@ -15,24 +16,16 @@ module Forwarder
         raise "Message '#{gmail_message.id}' does not contain raw information." \
           if gmail_message.raw.nil?
         Console.show_debug_message "Modifying 'To' and 'From' headers for #{gmail_message.id}"
-        reconstructed_message = gmail_message.raw
-          .gsub("=\nARC","~\nARC") # Need this to avoid accidentally splitting MD5s
-          .gsub("=\n","")
-          .gsub("~\nARC","=\nARC")
-          .gsub("=E2=80=99","'")
-          .gsub("=C2=AE","®")
-          .split("\n").map { |line|
-          if /^To: / =~ line
-            "To: #{recipient}".strip.unpack("M").first
-          elsif /^From: / =~ line
-            "From: #{sender}".strip.unpack("M").first
-          elsif /^Content-Transfer-Encoding: quoted-printable/ =~ line
-            next
-          else
-            line.strip.unpack("M").first
-          end
-        }.join("\n")
-        ReceiptEmail.new(gmail_message.id, reconstructed_message)
+        original_message = Mail.new(gmail_message.raw)
+        reconstructed_message = Mail.new do
+          from sender
+          to recipient
+          subject original_message.subject
+          body original_message.body.to_s
+          content_type original_message.content_type
+        end
+        Console.show_debug_message "Raw message: #{reconstructed_message.to_s}"
+        ReceiptEmail.new(gmail_message.id, reconstructed_message.to_s)
       end
 
       # Gets any emails tagged with the 'Receipts' label since
