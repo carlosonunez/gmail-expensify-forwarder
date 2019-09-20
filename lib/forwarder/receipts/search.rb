@@ -15,15 +15,21 @@ module Forwarder
         raise "Message '#{gmail_message.id}' does not contain raw information." \
           if gmail_message.raw.nil?
         Console.show_debug_message "Modifying 'To' and 'From' headers for #{gmail_message.id}"
-        reconstructed_message = gmail_message.raw.split("\n").map { |line|
+        reconstructed_message = gmail_message.raw
+          .gsub("=\nARC","~\nARC") # Need this to avoid accidentally splitting MD5s
+          .gsub("=\n","")
+          .gsub("~\nARC","=\nARC")
+          .gsub("=E2=80=99","'")
+          .gsub("=C2=AE","®")
+          .split("\n").map { |line|
           if /^To: / =~ line
-            "To: #{recipient}"
+            "To: #{recipient}".strip.unpack("M").first
           elsif /^From: / =~ line
-            "From: #{sender}"
+            "From: #{sender}".strip.unpack("M").first
           elsif /^Content-Transfer-Encoding: quoted-printable/ =~ line
-            ""
+            next
           else
-            line
+            line.strip.unpack("M").first
           end
         }.join("\n")
         ReceiptEmail.new(gmail_message.id, reconstructed_message)
