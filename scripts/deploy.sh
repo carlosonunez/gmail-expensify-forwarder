@@ -10,6 +10,7 @@ Gemfile
 serverless.yml
 env.gpg
 ITEMS
+  deploy_keyword_to_look_for="__nodeploy__"
 )
   for item in $items_that_would_trigger_new_commit
   do
@@ -17,6 +18,10 @@ ITEMS
     then
       >&2 echo "INFO: Since this file or directory was changed, we will re-deploy: $item"
       return 0
+    elif grep -q -- "$deploy_keyword_to_look_for" < <(git log -1 --pretty="%s")
+    then
+      >&2 echo "INFO: This commit was flagged for non-deployment."
+      return 1
     fi
   done
   return 1
