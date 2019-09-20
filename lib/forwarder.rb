@@ -3,7 +3,7 @@ require 'forwarder/console'
 require 'forwarder/aws'
 
 module Forwarder
-  def self.begin!
+  def self.process_receipts!
     email_sender = ENV['EMAIL_SENDER'] || Forwarder::AWS::get_parameter_from_ssm('email_sender')
     raise "Please define the address to send from." if email_sender.nil?
     expensify_address = ENV['EXPENSIFY_ADDRESS'] || \

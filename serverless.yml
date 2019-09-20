@@ -26,7 +26,7 @@ package:
 
 functions:
   forwarderBegin:
-    handler: bin/forwarder.begin
+    handler: bin/forwarder.process_receipts
     description: Begins scanning for and forwarding receipts.
     timeout: 60
     environment:

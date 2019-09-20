@@ -15,11 +15,11 @@ require 'forwarder'
 # For use with AWS Lambda and other serverless services
 # For some reason, Lambda provides an argument to this function.
 # Not sure what to do with it yet, so I'm discarding it.
-def begin(_)
-  Forwarder::begin!
+def process_receipts(_)
+  Forwarder::process_receipts!
 end
 
-Forwarder::begin!
+Forwarder::process_receipts!
 
 # Doing some debugging with my Lambda function to figure out why memory
 # is leaking
