@@ -1,5 +1,20 @@
 version: '3.7'
 services:
+  local-forwarder:
+    build:
+      context: .
+      args:
+        ENVIRONMENT: test
+    env_file: .env
+    environment:
+      FORWARDER_LAST_FINISHED_TIME_SECS: 1568955600
+      DEBUG_MODE: "true"
+      DRY_RUN: "false"
+    volumes:
+      - $PWD:/app
+      - /tmp:/secrets
+    working_dir: /app
+
   units:
     build:
       context: .
