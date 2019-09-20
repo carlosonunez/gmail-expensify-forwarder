@@ -5,19 +5,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install Docker Compose
-        run: curl -L ${DOCKER_COMPOSE_URL}/docker-compose-`uname -s`-`uname -m` > docker-compose &&
-             chmod +x docker-compose
+        run: curl -L ${DOCKER_COMPOSE_URL}/docker-compose-`uname -s`-`uname -m` > ./docker-compose &&
+             chmod +x ./docker-compose
         env:
           DOCKER_COMPOSE_URL: https://github.com/docker/compose/releases/download/1.22.0
 
       - name: Decrypt environment file
-        run: docker-compose -f docker-compose.ci.yml run --rm decrypt_env
+        run: ./docker-compose -f docker-compose.ci.yml run --rm decrypt_env
         env:
           ENV_PASSWORD: ${{ secrets.env_file_encryption_key }}
-          PATH: $PWD;$PATH
 
       - name: Deploy function
         run: scripts/deploy.sh
         env:
-          PATH: $PWD;$PATH
-
+          DOCKER_COMPOSE_LOCATION: .
