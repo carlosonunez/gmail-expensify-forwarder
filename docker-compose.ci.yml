@@ -20,5 +20,5 @@ services:
       - '--decrypt'
       - '--batch'
       - "--passphrase=$ENV_PASSWORD"
-      - '--out .env'
+      - '--output=.env'
       - .env.gpg
