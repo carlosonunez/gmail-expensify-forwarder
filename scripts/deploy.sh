@@ -11,7 +11,7 @@ serverless.yml
 env.gpg
 ITEMS
 )
-  for item in "$items_that_would_trigger_new_commit"
+  for item in $items_that_would_trigger_new_commit
   do
     if grep -q -- "$item" < <(git diff --stat "${GITHUB_SHA:-HEAD}~1")
     then
