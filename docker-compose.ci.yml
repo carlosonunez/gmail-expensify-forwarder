@@ -21,4 +21,4 @@ services:
       - '--batch'
       - "--passphrase=$ENV_PASSWORD"
       - '--output=.env'
-      - .env.gpg
+      - env.gpg
