@@ -35,6 +35,14 @@ _log() {
   printf "${color}${level_upcase}:${reset_colors} ${message}\n"
 }
 
+_enter_gef_dir() {
+  pushd "${GEF_INSTALL_DIRECTORY}" &>/dev/null
+}
+
+_exit_gef_dir() {
+  popd "${GEF_INSTALL_DIRECTORY}" &>/dev/null
+}
+
 log_info() {
   _log "info" "$*"
 }
@@ -53,6 +61,15 @@ clone_stable_version_of_gmail_expensify_forwarder() {
   log_info "Cloning Gmail Expensify Forwarder"
   mkdir -p "$GEF_INSTALL_DIRECTORY"
   git clone --branch stable "${GEF_GITHUB_URL}" "$GEF_INSTALL_DIRECTORY"
+}
+
+# Creates the environment file, which Compose needs even though we won't
+# be using it (unless we deploy to AWS)
+create_environment_file() {
+  log_info "Creating environment file"
+  _enter_gef_dir
+  scripts/create_env.sh
+  _exit_gef_dir
 }
 
 if {
