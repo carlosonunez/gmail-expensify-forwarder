@@ -9,6 +9,7 @@ PULUMI_ACCESS_TOKEN="$PULUMI_ACCESS_TOKEN"
 EMAIL_SENDER="$EMAIL_SENDER"
 GEF_GITHUB_URL="${GEF_GITHUB_URL:-https://github.com/carlosonunez/gmail-expensify-forwarder}"
 GEF_INSTALL_DIRECTORY="${HOME}/bin/gmail-expensify-forwarder"
+CREDENTIALS_FILE_PATH="${CREDENTIALS_FILE_PATH:-${GEF_INSTALL_DIRECTORY}/credentials.json}"
 
 _log() {
   level="${1?Please specify a log level.}"
@@ -59,8 +60,46 @@ log_error() {
 # TODO: Add support for cloning at HEAD and commit SHAs.
 clone_stable_version_of_gmail_expensify_forwarder() {
   log_info "Cloning Gmail Expensify Forwarder"
+  if test -d "$GEF_INSTALL_DIRECTORY"
+  then
+    log_warn "Forwarder already installed. Continuing."
+    return 0
+  fi
   mkdir -p "$GEF_INSTALL_DIRECTORY"
   git clone --branch stable "${GEF_GITHUB_URL}" "$GEF_INSTALL_DIRECTORY"
+}
+
+# Asks the user to supply the credentials file, unless it has already been supplied
+# in CREDENTIALS_FILE_PATH.
+prompt_for_gmail_credentials_json() {
+  log_info "Checking for Gmail credentials"
+  if ! test -f "$CREDENTIALS_FILE_PATH"
+  then
+    cat <<-GMAIL_CREDENTIALS_PROMPT
+Welcome to the Gmail Expensify Forwarder! I hope this script saves you as much
+time as it's saved me.
+
+To begin, you'll need to provide the script with credentials to Gmail. This is
+used to create a token that the Forwarder uses to search your inbox and forward
+receipts.
+
+This file is saved locally and isn't sent to anyone.
+
+Here's what you'll do:
+
+1. Open this link in your browser: ${RUBY_QUICKSTART_LINK}
+2. Click "Enable the Gmail API." Sign in if prompted.
+3. Click "Download Client Configuration". Save it as the file below:
+   ${CREDENTIALS_FILE_PATH}
+
+The script will automatically continue once you've downloaded this file.
+GMAIL_CREDENTIALS_PROMPT
+  while true
+  do
+    test -f "$CREDENTIALS_FILE_PATH" && break
+    sleep 1
+  done
+  fi
 }
 
 # Creates the environment file, which Compose needs even though we won't
