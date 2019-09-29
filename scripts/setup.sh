@@ -10,6 +10,7 @@ EMAIL_SENDER="$EMAIL_SENDER"
 GEF_GITHUB_URL="${GEF_GITHUB_URL:-https://github.com/carlosonunez/gmail-expensify-forwarder}"
 GEF_INSTALL_DIRECTORY="${HOME}/bin/gmail-expensify-forwarder"
 CREDENTIALS_FILE_PATH="${CREDENTIALS_FILE_PATH:-${GEF_INSTALL_DIRECTORY}/credentials.json}"
+RUBY_QUICKSTART_LINK="https://developers.google.com/gmail/api/quickstart/ruby"
 
 _log() {
   level="${1?Please specify a log level.}"
