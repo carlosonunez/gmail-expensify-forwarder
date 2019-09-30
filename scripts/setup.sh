@@ -85,7 +85,7 @@ Forwarder. You'll probably hit some bugs. If you do, please open a GitHub Issue!
 ${GEF_GITHUB_URL}/issues/new"
   fi
   mkdir -p "$GEF_INSTALL_DIRECTORY"
-  git clone --branch ${GEF_RELEASE}" "${GEF_GITHUB_URL}" "$GEF_INSTALL_DIRECTORY"
+  git clone --branch "${GEF_RELEASE}" "${GEF_GITHUB_URL}" "$GEF_INSTALL_DIRECTORY"
 }
 
 # Asks the user to supply the credentials file, unless it has already been supplied
@@ -136,13 +136,16 @@ create_environment_file() {
 # credentials file to generate the tokens needed for this script to work.
 create_gmail_token_file() {
   _enter_gef_dir
+  touch "${GEF_INSTALL_DIRECTORY}/tokens.yml"
   log_info "Authenticating this script to access your Gmail account. \
 Follow the instructions provided."
-  docker-compose run --rm authenticate-into-gmail
+  export CREDENTIALS_FILE_PATH="$CREDENTIALS_FILE_PATH"
+  export TOKEN_FILE_PATH="${GEF_INSTALL_DIRECTORY}/tokens.yml"
+  docker-compose run --rm -e "WAIT_FOR_AUTH_CODE=true" authenticate-into-gmail
   _exit_gef_dir
 }
 
-if {
+if ! {
   clone_stable_version_of_gmail_expensify_forwarder && \
   create_environment_file && \
   prompt_for_gmail_credentials_json && \
@@ -153,6 +156,9 @@ then
 Check the logs above for more information."
   _exit_gef_dir
   exit 1
+else
+  echo 'You are all set!'
+  exit 0
 fi
 
 if deploy_to_aws
