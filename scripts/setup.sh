@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Sets up an instance of the Gmail Expensify Forwarder for your account.
+USE_LOCAL_INSTANCE_OF_GEF="${USE_LOCAL_INSTANCE_OF_GEF:-false}"
 GEF_RELEASE="${GEF_RELEASE:-stable}"
 AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID"
 AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY"
@@ -12,6 +13,12 @@ GEF_GITHUB_URL="${GEF_GITHUB_URL:-https://github.com/carlosonunez/gmail-expensif
 GEF_INSTALL_DIRECTORY="${HOME}/bin/gmail-expensify-forwarder"
 CREDENTIALS_FILE_PATH="${CREDENTIALS_FILE_PATH:-${GEF_INSTALL_DIRECTORY}/credentials.json}"
 RUBY_QUICKSTART_LINK="https://developers.google.com/gmail/api/quickstart/ruby"
+
+_should_we_use_local_instance_of_gef() {
+  [ "$USE_LOCAL_INSTANCE_OF_GEF" == "true" ]
+}
+
+
 _log() {
   level="${1?Please specify a log level.}"
   message="$2"
@@ -60,6 +67,12 @@ log_error() {
 # Clones gmail-expensify-forwarder at stable version.
 clone_stable_version_of_gmail_expensify_forwarder() {
   log_info "Cloning Gmail Expensify Forwarder"
+  if _should_we_use_local_instance_of_gef
+  then
+    log_warn "You've asked to use a local copy of Gmail Expensify Forwarder. Copying it."
+    rm -rf "$GEF_INSTALL_DIRECTORY"
+    rsync -rlh --stats "$HOME/src/gmail-expensify-forwarder/" "$GEF_INSTALL_DIRECTORY"
+  fi
   if test -d "$GEF_INSTALL_DIRECTORY"
   then
     log_warn "Forwarder already installed. Continuing."
