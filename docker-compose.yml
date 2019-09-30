@@ -8,6 +8,8 @@ services:
     env_file: .env
     volumes:
       - $PWD:/app
+      - $CREDENTIALS_FILE_PATH:/tmp/credentials.json
+      - $TOKEN_FILE_PATH:/tmp/tokens.yml
     working_dir: /app
   authenticate-into-gmail:
     extends: forwarder
