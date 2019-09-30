@@ -38,7 +38,8 @@ module Forwarder
                       "after: #{last_run_time_secs.to_i} " + \
                       "before: #{Time.now.strftime('%s')}"
         full_messages = []
-        Gmail::Search.find_emails_matching_query(gmail_query).each do |message|
+        messages_found = Gmail::Search.find_emails_matching_query(gmail_query)
+        messages_found.each do |message|
           begin
             # The /user/messages/send method in the Gmail API supports
             # two email representations: 'full' and 'raw'.
