@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Sets up an instance of the Gmail Expensify Forwarder for your account.
+GEF_RELEASE="${GEF_RELEASE:-stable}"
 AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID"
 AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY"
 APP_AWS_ACCESS_KEY_ID="$APP_AWS_ACCESS_KEY_ID"
@@ -58,7 +59,6 @@ log_error() {
 }
 
 # Clones gmail-expensify-forwarder at stable version.
-# TODO: Add support for cloning at HEAD and commit SHAs.
 clone_stable_version_of_gmail_expensify_forwarder() {
   log_info "Cloning Gmail Expensify Forwarder"
   if test -d "$GEF_INSTALL_DIRECTORY"
@@ -66,8 +66,14 @@ clone_stable_version_of_gmail_expensify_forwarder() {
     log_warn "Forwarder already installed. Continuing."
     return 0
   fi
+  if test "${GEF_RELEASE}" != "stable"
+  then
+    log_warn "You're installing an experimental version of the Gmail Expensify \
+Forwarder. You'll probably hit some bugs. If you do, please open a GitHub Issue! \
+${GEF_GITHUB_URL}/issues/new"
+  fi
   mkdir -p "$GEF_INSTALL_DIRECTORY"
-  git clone --branch stable "${GEF_GITHUB_URL}" "$GEF_INSTALL_DIRECTORY"
+  git clone --branch ${GEF_RELEASE}" "${GEF_GITHUB_URL}" "$GEF_INSTALL_DIRECTORY"
 }
 
 # Asks the user to supply the credentials file, unless it has already been supplied
