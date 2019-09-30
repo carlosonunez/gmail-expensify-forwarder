@@ -16,19 +16,30 @@ Forwards emails from Gmail to Expensify.
 
 # How to run
 
-## Before You Start
+## Privacy Notice
 
-1. Ensure that you've created a "credentials.json" file as directed by the
-[Gmail Quickstart Guide for Ruby](https://developers.google.com/gmail/api/quickstart/ruby).
+This script requires the ability to view and send email on your behalf. It does so by retrieving
+and storing credentials locally. These credentials are stored locally and will never be shared without
+your consent.
 
-  Put it somewhere outside of this repository!
+If you run this script on AWS Lambda, it stores these credentials inside of AWS Parameter Store. This
+script does not create IAM users on your behalf. Ensure that the IAM user you use for Lambda is only
+given enough permissions to read and write to Parameter Store. You can do this by giving it the
+"AmazonSSMParameterStoreFullAccess" policy.
 
-2. Copy the example `.env` file: `cp .env.example .env`
-3. Change all of the "change me" values that you need to change.
+## Installing
 
-## Locally
+**NOTE**: You will need Docker and Docker Compose for this to work.
 
-Use `docker-compose run --rm forwarder` to run the Forwarder.
+Copy and paste this to install the Forwarder onto your machine.
+
+```sh
+curl -Lso https://raw.githubusercontent.com/carlosonunez/gmail-expensify-forwarder/stable/scripts/setup.sh
+./setup.sh
+```
+
+Answer the questions.
+
 
 ## AWS
 
