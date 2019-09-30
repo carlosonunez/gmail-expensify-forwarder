@@ -10,6 +10,17 @@ services:
       - $PWD:/app
       - /tmp:/secrets
     working_dir: /app
+  authenticate-into-gmail:
+    extends: forwarder
+    environment:
+      CREDENTIALS_PATH: /tmp/credentials.json
+      TOKEN_PATH: /tmp/tokens.yml
+    volumes:
+      - "${CREDENTIALS_PATH}:/tmp/credentials.json:ro"
+      - "${TOKEN_PATH}:/tmp/tokens.yml"
+    entrypoint:
+      - ruby
+      - bin/authenticate_into_gmail.rb
   vendor:
     extends: forwarder
     entrypoint: sh
