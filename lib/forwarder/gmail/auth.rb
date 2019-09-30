@@ -13,6 +13,7 @@ module Forwarder
         :tokens => ENV['TOKENS'] || Forwarder::AWS::get_parameter_from_ssm('TOKENS'),
         :reauthorize => ENV['REAUTHORIZE'].to_s.downcase == 'true',
         :last_auth_code => ENV['LAST_AUTH_CODE'],
+        :wait_for_auth_code => ENV['WAIT_FOR_AUTH_CODE'].to_s.downcase == 'true',
         :auth_scopes => ['SCOPE','GMAIL_READONLY','GMAIL_SEND'].map {|scope_name|
           eval "Google::Apis::GmailV1::AUTH_#{scope_name}"
         },
@@ -40,9 +41,21 @@ module Forwarder
           authorization_url = gmail_authorizer.get_authorization_url(
             base_url: @gmail_environment[:oauth_oob_url]
           )
-          raise "Gmail OAuth token expired. Go to this url, then set the " \
-            "LAST_AUTH_CODE environment variable with the code " \
-            "shown on the page: #{authorization_url}"
+          if @gmail_environment[:wait_for_auth_code]
+            puts "Gmail Oauth token expired. Go to #{authorization_url}, then " \
+              "paste the code provided here: "
+            auth_code = gets
+            if !auth_code.nil?
+              @gmail_environment[:last_auth_code] = auth_code
+              self.attempt_auth_with_reauth_code(gmail_authorizer)
+            else
+              raise "Invalid auth code provided."
+            end
+          else
+            raise "Gmail OAuth token expired. Go to this url, then set the " \
+              "LAST_AUTH_CODE environment variable with the code " \
+              "shown on the page: #{authorization_url}"
+          end
         else
           begin
             gmail_authorizer.get_and_store_credentials_from_code(
@@ -61,7 +74,7 @@ module Forwarder
       def self.authorize!
         clear_token_data_if_reauthorizing!
         if !@gmail_environment[:credentials].nil?
-          credentials_path_to_use = '/tmp/credentials.json'
+          credentials_path_to_use = @gmail_environment[:credentials_path]
           File.open(credentials_path_to_use, 'w') { |file|
             file.write(@gmail_environment[:credentials])
           }
@@ -72,7 +85,7 @@ module Forwarder
         end
         client_id = Google::Auth::ClientId.from_file credentials_path_to_use
         if !@gmail_environment[:tokens].nil?
-          token_path_to_use = '/tmp/tokens.yml'
+          token_path_to_use = @gmail_environment[:token_path]
           File.open(token_path_to_use, 'w') { |file|
             file.write(@gmail_environment[:tokens])
           }
