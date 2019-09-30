@@ -49,7 +49,7 @@ module Forwarder
           return ENV[parameter.upcase]
         end
         if !aws_enabled?
-          Console.show_warning_message "AWS is disabled; can't fetch #{parameter}"
+          Console.show_debug_message "AWS is disabled; can't fetch #{parameter}"
           return nil
         end
         path_to_parameter = "/gmail-expensify-forwarder/#{parameter.downcase}"
