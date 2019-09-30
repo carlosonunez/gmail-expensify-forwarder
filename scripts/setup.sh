@@ -12,7 +12,6 @@ GEF_GITHUB_URL="${GEF_GITHUB_URL:-https://github.com/carlosonunez/gmail-expensif
 GEF_INSTALL_DIRECTORY="${HOME}/bin/gmail-expensify-forwarder"
 CREDENTIALS_FILE_PATH="${CREDENTIALS_FILE_PATH:-${GEF_INSTALL_DIRECTORY}/credentials.json}"
 RUBY_QUICKSTART_LINK="https://developers.google.com/gmail/api/quickstart/ruby"
-
 _log() {
   level="${1?Please specify a log level.}"
   message="$2"
@@ -101,11 +100,13 @@ Here's what you'll do:
 
 The script will automatically continue once you've downloaded this file.
 GMAIL_CREDENTIALS_PROMPT
-  while true
-  do
-    test -f "$CREDENTIALS_FILE_PATH" && break
-    sleep 1
-  done
+    while true
+    do
+      test -f "$CREDENTIALS_FILE_PATH" && break
+      sleep 1
+    done
+  else
+    log_warn "Credentials file already found. Continuing..."
   fi
 }
 
@@ -118,6 +119,16 @@ create_environment_file() {
   _exit_gef_dir
 }
 
+# Runs the Forwarder once to authenticate as the user specified in the
+# credentials file to generate the tokens needed for this script to work.
+create_gmail_token_file() {
+  _enter_gef_dir
+  log_info "Authenticating this script to access your Gmail account. \
+Follow the instructions provided."
+  docker-compose run --rm authenticate-into-gmail
+  _exit_gef_dir
+}
+
 if {
   clone_stable_version_of_gmail_expensify_forwarder && \
   create_environment_file && \
@@ -127,6 +138,7 @@ if {
 then
   >&2 echo "ERROR: Something happened while setting up the Forwarder. \
 Check the logs above for more information."
+  _exit_gef_dir
   exit 1
 fi
 
