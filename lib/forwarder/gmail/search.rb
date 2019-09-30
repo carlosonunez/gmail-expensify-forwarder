@@ -19,7 +19,9 @@ module Forwarder
         Console.show_debug_message "~#{messages_found.result_size_estimate} messages found."
         return [] if messages_found.result_size_estimate == 0
         messages_to_return = []
+        message_index = 1
         messages_found.messages.each do |message|
+          Console.show_info_message "Processing email: #{message_index}/#{messages_found.messages.length}"
           begin
             # The /user/messages/send method in the Gmail API supports
             # two email representations: 'full' and 'raw'.
@@ -31,6 +33,7 @@ module Forwarder
             Console.show_debug_message "Fetching raw message for #{message.id}"
             raw_message = gmail_service.service.get_user_message('me', message.id, format: 'raw').raw
             messages_to_return.push(Receipts::ReceiptEmail.new(message.id, raw_message))
+            message_index += 1
           rescue Exception => e
             raise "Error while attempting to get message #{message.id}: #{e}"
           end
