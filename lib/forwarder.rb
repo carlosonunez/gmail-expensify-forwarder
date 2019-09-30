@@ -16,9 +16,12 @@ module Forwarder
     raise 'No receipts found.' if emails_found.nil?
 
     Console.show_info_message "We found #{emails_found.length} emails."
+    message_index = 1
     emails_found.each do |email|
       begin
+        Console.show_info_message "Sending message: #{message_index} of #{emails_found.length}"
         email.send_with_gmail
+        message_index += 1
       rescue Exception => e
         raise "Unable to send email: #{e}"
       end
@@ -29,9 +32,7 @@ module Forwarder
     if Forwarder::AWS::aws_enabled?
       Forwarder::AWS.set_last_run_time_in_aws_ssm! time_finished_secs
     else
-      Console.show_info_message "We've processed all of the messages " + \
-        "that we could find. To re-run this script again from where we " + \
-        "left off, set 'FORWARDER_LAST_FINISHED_TIME_SECS' to '#{time_finished_secs}'."
+      Console.show_info_message "We've processed all of the messages that we could find!"
     end
   end
 end
