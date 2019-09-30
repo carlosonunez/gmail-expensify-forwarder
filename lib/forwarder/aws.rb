@@ -38,10 +38,6 @@ module Forwarder
 
     def self.get_parameter_from_ssm(parameter)
       verify_environment
-      if !aws_enabled?
-        Console.show_warning_message "AWS is disabled; can't fetch #{parameter}"
-        return nil
-      end
       Console.show_debug_message "🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨"
       Console.show_debug_message "#{__method__.to_s} leaks sensitive info when " + \
         "DEBUG_MODE=true. Turn DEBUG_MODE off in Production to prevent yourself " + \
@@ -51,6 +47,10 @@ module Forwarder
         if !ENV[parameter.upcase].nil?
           Console.show_warning_message "#{parameter} was found in local environment; skipping."
           return ENV[parameter.upcase]
+        end
+        if !aws_enabled?
+          Console.show_warning_message "AWS is disabled; can't fetch #{parameter}"
+          return nil
         end
         path_to_parameter = "/gmail-expensify-forwarder/#{parameter.downcase}"
         value = @@ssm_client.get_parameter({name: path_to_parameter}).parameter.value
