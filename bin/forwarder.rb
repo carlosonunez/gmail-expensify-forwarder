@@ -20,9 +20,3 @@ def process_receipts(_)
 end
 
 Forwarder::process_receipts!
-
-# Doing some debugging with my Lambda function to figure out why memory
-# is leaking
-total_objects = GC.stat[:total_allocated_objects]
-total_pages = GC.stat[:total_allocated_pages]
-puts "Objects in heaps: #{total_objects} => #{total_pages}"
