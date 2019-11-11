@@ -10,9 +10,9 @@ Gemfile
 serverless.yml
 env.gpg
 ITEMS
+)
   deploy_keyword_to_look_for="__deploy__"
   nondeploy_keyword_to_look_for="__nodeploy__"
-)
   for item in $items_that_would_trigger_new_commit
   do
     if grep -q -- "$item" < <(git diff --stat "${GITHUB_SHA:-HEAD}")
