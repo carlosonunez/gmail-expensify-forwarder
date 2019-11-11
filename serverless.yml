@@ -34,6 +34,7 @@ functions:
       USE_AWS: true
       APP_AWS_ACCESS_KEY_ID: ${env:APP_AWS_ACCESS_KEY_ID}
       APP_AWS_SECRET_ACCESS_KEY: ${env:APP_AWS_SECRET_ACCESS_KEY}
+      GOOGLE_ACCOUNT_EMAIL: ${env:GOOGLE_ACCOUNT_EMAIL}
     events:
       - schedule:
           name: gmail_receipt_check
