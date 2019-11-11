@@ -1,4 +1,5 @@
 require 'aws-sdk-ssm'
+require 'digest'
 
 module Forwarder
   class AWS
@@ -14,8 +15,17 @@ module Forwarder
       })
     end
 
+    def self.get_hashed_email_address
+      raise "Google account not provided" if ENV['GOOGLE_ACCOUNT_EMAIL'].nil?
+
+      Console.show_debug_message "Hashing: #{ENV['GOOGLE_ACCOUNT_EMAIL']}"
+      Digest::MD5.hexdigest ENV['GOOGLE_ACCOUNT_EMAIL']
+    end
+
     def self.verify_environment
-      [ 'APP_AWS_ACCESS_KEY_ID', 'APP_AWS_SECRET_ACCESS_KEY', 'AWS_REGION' ].each do |required_env_var|
+      [ 'APP_AWS_ACCESS_KEY_ID', 
+        'APP_AWS_SECRET_ACCESS_KEY',
+        'AWS_REGION' ].each do |required_env_var|
         raise "AWS environment variable missing: #{required_env_var}" if ENV[required_env_var].nil?
       end
     end
@@ -25,9 +35,10 @@ module Forwarder
         Console.show_warning_message "Last time to use set in environment; skipping."
       else
         verify_environment
+        ga_hash = self.get_hashed_email_address
         Console.show_debug_message "Setting the last run time to: #{time_to_put}"
         @@ssm_client.put_parameter({
-          name: '/gmail-expensify-forwarder/forwarder_last_finished_time_secs',
+          name: "/gmail-expensify-forwarder/#{ga_hash}/forwarder_last_finished_time_secs",
           description: 'The last time the Gmail to Expensify forwarder ran.',
           value: time_to_put,
           overwrite: true,
@@ -52,7 +63,9 @@ module Forwarder
           Console.show_debug_message "AWS is disabled; can't fetch #{parameter}"
           return nil
         end
-        path_to_parameter = "/gmail-expensify-forwarder/#{parameter.downcase}"
+        ga_hash = self.get_hashed_email_address
+        path_to_parameter = "/gmail-expensify-forwarder/#{ga_hash}/#{parameter.downcase}"
+        Console.show_debug_message "SSM Parameter: #{path_to_parameter}"
         value = @@ssm_client.get_parameter({name: path_to_parameter}).parameter.value
         Console.show_debug_message "SSM Parameter: #{path_to_parameter} => #{value}"
         value

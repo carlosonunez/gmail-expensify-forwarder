@@ -1,5 +1,7 @@
 #!/usr/bin/env sh
-AWS_SSM_NAMESPACE='/gmail-expensify-forwarder'
+EMAIL_ADDRESS_TO_SEED_WITH="${EMAIL_ADDRESS_TO_SEED_WITH?Please provide an email address to seed.}"
+email_address_hashed=$(printf "$EMAIL_ADDRESS_TO_SEED_WITH" | md5sum | awk '{print $1}')
+AWS_SSM_NAMESPACE="/gmail-expensify-forwarder/$email_address_hashed"
 
 if ! test -f /.dockerenv
 then
@@ -7,14 +9,16 @@ then
 Use the 'seed-aws-ssm' Docker Compose service to run this script."
   exit 1
 fi
-
-seed_gmail_credentials() {
-  if ! test -f "$CREDENTIALS_PATH"
+for file in "$CREDENTIALS_PATH" "$TOKEN_PATH"
+do
+  if ! test -f "$file"
   then
-    >&2 echo "ERROR: Couldn't find Gmail credentials; store them here: $CREDENTIALS_PATH"
+    >&2 echo "ERROR: Ensure that $file is present."
     exit 1
   fi
+done
 
+seed_gmail_credentials() {
   aws ssm put-parameter --name "${AWS_SSM_NAMESPACE}/credentials" \
     --description "Gmail credentials to use" \
     --value "$(cat "$CREDENTIALS_PATH")" \
@@ -24,13 +28,6 @@ seed_gmail_credentials() {
 }
 
 seed_gmail_tokens() {
-  if ! test -f "$TOKEN_PATH"
-  then
-    >&2 echo "ERROR: Couldn't find Gmail tokens; run forwarder locally, then store \
-the tokens here: $TOKEN_PATH"
-    exit 1
-  fi
-
   aws ssm put-parameter --name "${AWS_SSM_NAMESPACE}/tokens" \
     --description "Authenticated Gmail tokens to use" \
     --value "$(cat "$TOKEN_PATH")" \

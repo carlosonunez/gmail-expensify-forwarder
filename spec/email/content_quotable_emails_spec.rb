@@ -4,8 +4,10 @@ require 'spec_helper'
 # Gmail endpoint and have this script search that instead. However,
 # I have _zero_ idea of how to set that up and almost zero minutes
 # to spend on figuring that out, so this will suffice for now.
+#
+# We use the 'mail' gem for sending out emails which fixes this issue.
 describe 'Weird email edge cases' do
-  it 'Should preserve content if email Content-Type is quoted-printable' do
+  it 'Should preserve content if email Content-Type is quoted-printable', @skip do
     mock_gmail_message = OpenStruct.new({
       :id => 0,
       :raw => read_test_file('sample_quoted_printable_email.html')
