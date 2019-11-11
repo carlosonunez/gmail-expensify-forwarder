@@ -1,5 +1,6 @@
 #!/usr/bin/env sh
 EMAIL_ADDRESS_TO_SEED_WITH="${EMAIL_ADDRESS_TO_SEED_WITH?Please provide an email address to seed.}"
+EMAIL_SENDER="${EMAIL_SENDER?Please provide the email address to use for sending emails out.}"
 email_address_hashed=$(printf "$EMAIL_ADDRESS_TO_SEED_WITH" | md5sum | awk '{print $1}')
 AWS_SSM_NAMESPACE="/gmail-expensify-forwarder/$email_address_hashed"
 

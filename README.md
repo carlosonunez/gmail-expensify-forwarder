@@ -45,15 +45,34 @@ Answer the questions.
 
 You can run the Forwarder within AWS Lambda.
 
-1. Run the Forwarder locally _at least once_ to generate `credentials.json` and
-   `token.yml` files.
+1. Go to the [Ruby Quickstart Guide](https://developers.google.com/gmail/api/quickstart/ruby)
+   and generate a Client ID for your Forwarder. Download the file into the `secrets/` directory.
 
-2. Run `scripts/seed_aws_ssm.sh` to populate AWS SSM with the content from the files
-   above.
+2. Create an empty file called `tokens.yml` in the `secrets/` directory as well.
 
-3. Run `scripts/deploy.sh` to deploy underlying infrastructure. Ensure that the
+3. Run `docker-compose run --rm authenticate-into-gmail-step-1`. This will tell you to click on a
+   link, which will open your browser and prompt for permission.
+
+   Note that Forwarder only scans your inbox and sends emails tagged "Receipts" to Expensify.
+   No other Gmail API calls are made.
+
+   Once you're done, you will get a code. Copy that code.
+
+4. Run `LAST_AUTH_CODE=auth_code_here docker-compose run --rm authenticate-into-gmail-step-2`.
+   Paste the code you received in `step-1` where it says
+   `auth_code_here`. Once this is done, your `tokens.yml` file should now have
+   a token for use with the Gmail API.
+
+5. Run `EMAIL_ADDRESS=youremail@gmail.com docker-compose run --rm seed-aws-ssm` to
+   populate these credentials and tokens into the Parameter Store.
+
+6. Edit the `serverless.yml` file and ensure that the `GOOGLE_ACCOUNT_EMAIL`
+   environment variable for the `forwarderBegin` function matches `youremail@gmail.com`
+   from step 5.
+
+7. Run `scripts/deploy.sh` to deploy underlying infrastructure. Ensure that the
    `PULUMI_ACCESS_TOKEN` and AWS access and secret keys are set per the `.env` file
 
-4. Run `scripts/monitor.sh` to check that your instance of Forwarder is running.
+8. Run `scripts/monitor.sh` to check that your instance of Forwarder is running.
 
-5. Run `scripts/destroy.sh` to stop and remove all instances of Forwarder from Lambda.
+9. Run `scripts/destroy.sh` to stop and remove all instances of Forwarder from Lambda.

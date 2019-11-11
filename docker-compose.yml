@@ -1,5 +1,11 @@
 version: '2.2'
 services:
+  awscli:
+    image: anigeo/awscli
+    env_file: .env
+    volumes:
+      - $PWD:/app
+    working_dir: /app
   forwarder:
     build:
       context: .
@@ -9,14 +15,40 @@ services:
     volumes:
       - $PWD:/app
     working_dir: /app
-  authenticate-into-gmail:
+  authenticate-into-gmail-step-1:
     extends: forwarder
+    environment:
+      REAUTHORIZE: "true"
+      USE_AWS: "false"
     volumes:
-      - $CREDENTIALS_FILE_PATH:/tmp/credentials.json
-      - $TOKEN_FILE_PATH:/tmp/tokens.yml
+      - $PWD/secrets/credentials.json:/tmp/credentials.json
+      - $PWD/secrets/tokens.yml:/tmp/tokens.yml
     entrypoint:
       - ruby
       - bin/authenticate_into_gmail.rb
+  authenticate-into-gmail-step-2:
+    extends: forwarder
+    environment:
+      LAST_AUTH_CODE: "$LAST_AUTH_CODE"
+      USE_AWS: "false"
+    volumes:
+      - $PWD/secrets/credentials.json:/tmp/credentials.json
+      - $PWD/secrets/tokens.yml:/tmp/tokens.yml
+    entrypoint:
+      - ruby
+      - bin/authenticate_into_gmail.rb
+  seed-aws-ssm:
+    extends: awscli
+    entrypoint: sh
+    environment:
+      CREDENTIALS_PATH: /secrets/credentials.json
+      TOKEN_PATH: /secrets/tokens.yml
+      EMAIL_ADDRESS_TO_SEED_WITH: "$EMAIL_ADDRESS"
+      EMAIL_SENDER: "$EMAIL_SENDER"
+    volumes:
+      - $PWD/secrets:/secrets
+    command:
+      - scripts/seed_aws_ssm.sh
   vendor:
     extends: forwarder
     entrypoint: sh

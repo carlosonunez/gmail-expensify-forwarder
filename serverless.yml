@@ -25,7 +25,23 @@ package:
     - docker-compose.*
 
 functions:
-  forwarderBegin:
+  forwarderBeginWork:
+    handler: bin/forwarder.process_receipts
+    description: Begins scanning for and forwarding receipts.
+    timeout: 60
+    environment:
+      GEM_PATH: vendor/bundle
+      USE_AWS: true
+      APP_AWS_ACCESS_KEY_ID: ${env:APP_AWS_ACCESS_KEY_ID}
+      APP_AWS_SECRET_ACCESS_KEY: ${env:APP_AWS_SECRET_ACCESS_KEY}
+      GOOGLE_ACCOUNT_EMAIL: ${env:GOOGLE_ACCOUNT_EMAIL_WORK}
+    events:
+      - schedule:
+          name: gmail_receipt_check
+          description: Checks for receipts
+          rate: rate(1 minute)
+          enabled: true
+  forwarderBeginPersonal:
     handler: bin/forwarder.process_receipts
     description: Begins scanning for and forwarding receipts.
     timeout: 60

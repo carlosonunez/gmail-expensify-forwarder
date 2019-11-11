@@ -49,14 +49,3 @@ services:
     extends: serverless
     command:
       - remove
-  seed-aws-ssm:
-    extends: awscli
-    entrypoint: sh
-    environment:
-      CREDENTIALS_PATH: /credentials/credentials.json
-      TOKEN_PATH: /tokens/tokens.json
-    volumes:
-      - $CREDENTIALS_VOLUME:/credentials
-      - $TOKENS_VOLUME:/tokens
-    command:
-      - scripts/seed_aws_ssm.sh

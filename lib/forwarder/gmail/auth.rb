@@ -107,9 +107,11 @@ module Forwarder
 
       def self.sign_in!
         validate_environment!
+        Console.show_debug_message "Signing into Gmail..."
         service = Google::Apis::GmailV1::GmailService.new
         service.client_options.application_name = @gmail_environment[:gmail_application_name]
         service.authorization = authorize!
+        Console.show_debug_message "Gmail sign-in complete."
         service
       end
     end
